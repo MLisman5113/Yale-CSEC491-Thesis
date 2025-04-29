@@ -55,6 +55,7 @@ const N_AVG = 1000
 
 # Ensure output folders exist
 mkpath("plots")
+mkpath("data")
 
 ############# CSV helper ##################
 #=

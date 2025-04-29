@@ -18,7 +18,7 @@ This repository includes:
 ## Files
 
 - [Original Proposal](proposal.pdf)
-- [Final Thesis](test.pdf)
+- [Final Thesis](CSEC_491_Thesis_Marcus_Lisman.pdf)
 
 ## Notes
 - All files are included as static files.
