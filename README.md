@@ -21,5 +21,5 @@ This repository includes:
 - [Thesis Code](markov-model-qlV2.jl)
 
 ## Notes
-- All files are included as static PDFs.
+- All files are included as static files.
 - Internal links are relative to ensure correct navigation after compression or transfer.
