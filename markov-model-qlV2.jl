@@ -14,7 +14,7 @@
 # 
 #   To run this file in Julia REPL:
 #   1) include("markov-model-final.jl")
-#   2) include("markov-model-ql.jl")
+#   2) include("markov-model-qlV2.jl")
 #   3) MarkovModelQL.demo_run()
 #
 #   Author: Marcus A. Lisman, Yale University
@@ -34,7 +34,7 @@ using PrettyTables
 # 0.  House‑keeping constants & helpers                              #
 # ####################################################################
 
-# Figures we still want; everything else is skipped automatically
+# Figures I want to keep
 const KEEP_FIGS = Set([
     "firing_comparison.png",
     "flip_threshold.png",
@@ -56,7 +56,7 @@ const N_AVG = 1000
 # Ensure output folders exist
 mkpath("plots")
 
-# ------------------------------------------  CSV helper -------------#
+############# CSV helper ##################
 #=
     save_to_csv(fname; kw...)
 
@@ -68,7 +68,7 @@ function save_to_csv(fname; kw...)
     CSV.write(fname, df; append=isfile(fname))
 end
 
-# -------------------------------------  Plot gate helper -----------#
+############## Plot gate helper ##################
 #=
     maybe_plot(fname::AbstractString, plot_func, args...; kwargs...)
 
@@ -122,7 +122,7 @@ We can define:
 We'll store Q[state, action].
 """
 
-# Let's define enumerations
+# define enumerations
 @enum EmpStatus begin
     E  # employed
     U  # unemployed
@@ -311,7 +311,7 @@ function derive_policy(Q)
 end
 
 #####################################################################
-#    Pretty‑print summary for Q‑learning                               
+#    Print Summary for Q‑learning                               
 #####################################################################
 """
     print_qlearning_summary(params, Q, rewards, surplus, fired)
@@ -342,7 +342,7 @@ end
 """
     compare_dp_rl(params; num_runs=10, num_ep=200, max_steps=2)
 
-Pretty‑prints the DP solution and an averaged Q‑learning summary
+Prints the DP solution and an averaged Q‑learning summary
 for the same parameters.
 """
 function compare_dp_rl(params::ModelParams;
@@ -500,7 +500,7 @@ function value_iteration(params::ModelParams; tol=1e-8, maxiter=1000)
     hcost = hostility_cost(params)  # k - s_bar if s_bar < k, else 0
 
     # Initialize guesses for value function
-    # We track: V_E(H), V_E(L), V_U(H), V_U(L)
+    # Track: V_E(H), V_E(L), V_U(H), V_U(L)
     VE_H, VE_L, VU_H, VU_L = 0.0, 0.0, 0.0, 0.0
 
     # We'll iterate until convergence
@@ -650,7 +650,7 @@ end
 
 function demo_run()
     # baseline parameters
-    w, s̄, k, δ, H, L = 1.0, 0.5, 2.0, 0.95, 2.5, 0.5
+    w, s̄, k, δ, H, L = 1.0, 0.5, 2.0, 0.95, 2.5, 0.5  # baseline 0.5 for severance
     num_ep, ms = 100, 2
     αQ, γ, τ0, decay = 0.1, 0.95, 1.0, 0.999
 
@@ -676,9 +676,9 @@ function demo_run()
     
     pvals = collect(0.5:0.05:0.99)
 
-    # ------------------------------------------------------------------#
-    # 1)  Profit & Surplus sweep                                        #
-    # ------------------------------------------------------------------#
+    # --------------------------------------------------------------#
+    # 1)  Profit & Surplus sweep                                    #
+    # --------------------------------------------------------------#
     profits    = [avg_metric(x -> mean(x[2]),    # 2 = rewards
                             ModelParams(w, s̄, k, p, δ, H, L))
                 for p in pvals]
@@ -692,9 +692,9 @@ function demo_run()
     save_to_csv("data/profit_surplus.csv";
         p = pvals, firm_profit = profits, social_surplus = surpluses)
 
-    # ------------------------------------------------------------------#
-    # 2)  Hostility incidence                                           #
-    # ------------------------------------------------------------------#
+    # --------------------------------------------------------------#
+    # 2)  Hostility incidence                                       #
+    # --------------------------------------------------------------#
     incid = [avg_metric(x -> mean(x[5]),          # 5 = fired (Bool vector)
                         ModelParams(w, s̄-1e-6, k, p, δ, H, L))
              for p in pvals]
@@ -703,9 +703,9 @@ function demo_run()
                incid, pvals)
     save_to_csv("data/hostility_incidence.csv"; p = pvals, fired_frac = incid)
 
-    # ------------------------------------------------------------------#
-    # 3)  Hostility vs No‑hostility comparisons                         #
-    # ------------------------------------------------------------------#
+    # --------------------------------------------------------------#
+    # 3)  Hostility vs No‑hostility comparisons                     #
+    # --------------------------------------------------------------#
     n = length(pvals)
     firm_noh = zeros(n); worker_noh = zeros(n); fire_noh = zeros(n)
     firm_h   = zeros(n); worker_h   = zeros(n); fire_h   = zeros(n)
@@ -756,9 +756,9 @@ function demo_run()
     save_to_csv("data/firing_comparison.csv";
         p = pvals, fire_noh = fire_noh, fire_h = fire_h)
 
-    # ---------------------------------------------------------------#
-    # 4)  Additional line plots                                      #
-    # ---------------------------------------------------------------#
+    # -----------------------------------------------------------#
+    # 4)  Additional line plots                                  #
+    # -----------------------------------------------------------#
     ratio_noh = worker_noh ./ firm_noh
     ratio_h   = worker_h   ./ firm_h
     var_noh   = fire_noh 
@@ -789,9 +789,9 @@ function demo_run()
     save_to_csv("data/reward_variance.csv";
         p = pvals, var_noh = var_noh, var_h = var_h)
 
-    # ---------------------------------------------------------------#
-    # 5)  Worker payoff & welfare & gap                              #
-    # ---------------------------------------------------------------#
+    # -----------------------------------------------------------#
+    # 5)  Worker payoff & welfare & gap                          #
+    # -----------------------------------------------------------#
     gap_noh = abs.(firm_noh .- worker_noh)
     gap_h   = abs.(firm_h   .- worker_h)
     tot_noh = firm_noh .+ worker_noh
@@ -829,16 +829,16 @@ function demo_run()
     maybe_plot("flip_threshold.png", plot_flip_threshold, p_noh, p_h)
     save_to_csv("data/flip_threshold.csv"; p_noh = [p_noh], p_h = [p_h])
 
-    # ------------------------------------------------------------------#
-    # 7)  Pretty‑print a representative Q‑learning run                  #
-    # ------------------------------------------------------------------#
+    # --------------------------------------------------------------#
+    # 7)  Print a representative Q‑learning run                     #
+    # --------------------------------------------------------------#
     params_demo = ModelParams(w, s̄, k, 0.7, δ, H, L)
     (Q_demo, r_demo, s_demo, _, fired_demo, _, _, _) =
         run_q_learning(params_demo; num_episodes=100, max_steps=ms,
                        alpha_Q=αQ, gamma=γ, temperature=τ0, temp_decay=decay)
     print_qlearning_summary(params_demo, Q_demo, r_demo, s_demo, fired_demo)
 
-    ### NEW ###   pretty‑print sweep over p
+    # Print sweep over p
     println("\n================ SUMMARY SWEEP (DP vs RL) =======================")
     for p in pvals
         println("\n----------------  p = $(round(p, digits=2))  -------------------")

@@ -10,7 +10,7 @@ This repository includes:
 ## Files
 
 - [Original Proposal](proposal.pdf)
-- [Final Thesis](thesis.pdf)
+- [Final Thesis](test.pdf)
 
 ## Notes
 - All files are included as static PDFs.
