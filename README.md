@@ -13,6 +13,7 @@ This repository includes:
 
 - The **original project proposal**
 - The **final thesis writeup**
+- All code written for my thesis
 
 ## Files
 
